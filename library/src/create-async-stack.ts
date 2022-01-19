@@ -13,9 +13,10 @@ export type StackItem<T = any> = {
   key: string;
   status: Status;
   promise: Promise<StackItem<T>>;
+  pop: () => void;
   onPushEnd: () => void;
   onPopEnd: () => void;
-  data?: T;
+  data: T;
 };
 
 export type StackState<T = any> = {
@@ -51,10 +52,12 @@ function createAsyncStack<T = any>() {
       pushResolvers[key] = resolve;
     });
 
+    // @ts-ignore
     const item: StackItem<T> = {
       key,
       promise,
       status: "pushing" as Status,
+      pop: () => pop(),
       onPushEnd: () => onPushEnd(key),
       onPopEnd: () => onPopEnd(key),
     };
@@ -72,21 +75,24 @@ function createAsyncStack<T = any>() {
 
   function onPushEnd(key: string) {
     const item = lookup[key];
+    
+    if (item.status === "pushing") {
+      item.status = "settled";
 
-    item.status = "settled";
+      const resolver = pushResolvers[key];
 
-    const resolver = pushResolvers[key];
+      if (resolver) {
+        resolver(getItemByKey(key));
+        delete pushResolvers[key];
+      }
 
-    if (resolver) {
-      resolver(getItemByKey(key));
       emit("pushend", key);
-      delete pushResolvers[key];
     }
 
     return item;
   }
 
-  function pop(amount = 1, startIndex = 0) {
+  function pop(amount = 1) {
     let items: StackItem[] = [];
 
     if (amount === -1) {
@@ -94,8 +100,20 @@ function createAsyncStack<T = any>() {
       amount = keys.length;
     }
 
-    for (let i = 1; i <= amount; i++) {
-      const key = keys[keys.length - startIndex - i];
+    let startIndex = keys.length - 1;
+
+    for (let i = keys.length - 1; i >= 0; i--) {
+      const key = keys[i];
+      const item = lookup[key];
+
+      if (item && (item.status === "settled" || item.status === "pushing")) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    for (let i = startIndex; i > startIndex - amount; i--) {
+      const key = keys[i];
       const item = lookup[key];
 
       if (item) {
@@ -121,17 +139,17 @@ function createAsyncStack<T = any>() {
 
   function onPopEnd(key: string) {
     const item = lookup[key];
-
     keys = keys.filter((k) => k !== key);
 
     const resolver = popResolvers[key];
 
     if (resolver) {
-      item.status = "popped"
       resolver(getItemByKey(key));
-      emit("popend", key);
       delete popResolvers[key];
     }
+
+    item.status = "popped";
+    emit("popend", key);
 
     return item;
   }

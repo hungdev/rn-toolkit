@@ -1,4 +1,4 @@
-import { createAsyncStack } from "../index";
+import { createAsyncStack } from "../create-async-stack";
 
 test("export", () => {
   expect(createAsyncStack).toBeDefined();
@@ -110,8 +110,6 @@ test("unable to popend more than once", () => {
   item.onPopEnd();
 });
 
-test.todo("unable to onPopEnd a stack item that is pushing");
-
 test("passes data to items", () => {
   const stack = createAsyncStack<{ test: string }>();
   const item = stack.push({ test: "value" });
@@ -119,6 +117,6 @@ test("passes data to items", () => {
   expect(item.data?.test).toEqual("value");
 });
 
-
-test.todo('await promise on push -> returns stack item')
-test.todo('await promise on pop -> returns stack item')
+test.todo("unable to onPopEnd a stack item that is pushing");
+test.todo("await promise on push -> returns stack item");
+test.todo("await promise on pop -> returns stack item");
