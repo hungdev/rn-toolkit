@@ -25,8 +25,8 @@ export function createScreenStack() {
 
   const p = Screens.pop;
 
-  function pop(amount?: number, startIndex?: number) {
-    const items = p(amount, startIndex);
+  function pop(amount?: number) {
+    const items = p(amount);
 
     items.forEach((item) => {
       item.onPopEnd();

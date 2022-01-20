@@ -16,7 +16,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function ModalItem({
   status,
   data,
-  pop,
   onPopEnd,
   onPushEnd,
 }: ModalItemProps) {
