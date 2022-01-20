@@ -47,7 +47,7 @@ function MyComponent() {
         Stack.push({
           element: <MyScreen />,
           screenProps: {
-            presentationMode: "modal",
+            stackPresentation: "modal",
           },
         });
       }}

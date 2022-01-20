@@ -1,17 +1,17 @@
 import * as React from "react";
 import { View, Button, Text } from "react-native";
 
-import { ToolkitProvider, BottomSheet, Modal } from "rn-toolkit";
+import { ToolkitProvider, BottomSheet, Modal, Stack } from "rn-toolkit";
 
 export default function App() {
   return (
     <ToolkitProvider>
-      <Main />
+      <MyApp />
     </ToolkitProvider>
   );
 }
 
-function Main() {
+function MyApp() {
   return (
     <View
       style={{
@@ -21,54 +21,63 @@ function Main() {
       }}
     >
       <View>
-        <Text>HI</Text>
+        <Button
+          title="Push screen"
+          onPress={() => {
+            Stack.push({
+              element: <MyScreen />,
+              screenProps: {
+                stackPresentation: "modal",
+              },
+            });
+          }}
+        />
+
+        <Button
+          title="Push bottom sheet"
+          onPress={() => {
+            BottomSheet.push({
+              element: <MyBottomSheet />,
+              bottomSheetProps: {
+                snapPoints: [400, 600],
+              },
+            });
+          }}
+        />
+
+        <Button
+          title="Push modal"
+          onPress={() => {
+            Modal.push({
+              element: <MyModal />,
+            });
+          }}
+        />
       </View>
-      <Button title="Show" onPress={pushBottomSheet} />
     </View>
   );
 }
 
-function pushBottomSheet() {
-  BottomSheet.push({
-    bottomSheetProps: { snapPoints: [200, 400] },
-    element: <MyBottomSheet onPress={pushModal} />,
-  });
-}
-
-function pushModal() {
-  Modal.push({
-    element: <MyModal />,
-  });
-}
-
-function MyBottomSheet({ onPress }: any) {
+function MyScreen() {
   return (
-    <View style={{ padding: 12, paddingVertical: 64 }}>
-      <Text>Awesome 🎉</Text>
-      <Button title="Push" onPress={onPress} />
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <Text>Hi</Text>
+    </View>
+  );
+}
+
+function MyBottomSheet() {
+  return (
+    <View>
+      <Text>Hi</Text>
     </View>
   );
 }
 
 function MyModal() {
   return (
-    <ModalContainer>
-      <Text>Awesome 🎉</Text>
-    </ModalContainer>
-  );
-}
-
-function ModalContainer({ children }: any) {
-  return (
-    <View
-      style={{
-        borderRadius: 16,
-        backgroundColor: "white",
-        marginHorizontal: 16,
-        padding: 16,
-      }}
-    >
-      {children}
+    <View style={{ backgroundColor: "white" }}>
+      <Text>Hi</Text>
     </View>
   );
 }
